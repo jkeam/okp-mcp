@@ -15,10 +15,11 @@ Commands:
   start        Create the okp pod and start the RHOKP and MCP server containers.
                Requires RHOKP_ACCESS_KEY to be set. Get one at:
                $ACCESS_KEY_URL
-  verify solr  Query Solr to check that RHOKP is running and has indexed content.
-  verify mcp   Send an MCP initialize request to verify the MCP server is responding.
-  cleanup      Stop and remove the okp pod and all its containers.
-  help         Show this help message.
+  verify solr        Query Solr to check that RHOKP is running and has indexed content.
+  verify mcp         Send an MCP initialize request to verify the MCP server is responding.
+  integration cursor Show the MCP server config snippet for Cursor.
+  cleanup            Stop and remove the okp pod and all its containers.
+  help               Show this help message.
 EOF
 }
 
@@ -60,6 +61,22 @@ verify_usage() {
   exit 1
 }
 
+cmd_integration_cursor() {
+  cat <<'EOF'
+Add the following to your Cursor MCP config:
+
+"okp-mcp": {
+  "url": "http://localhost:8000/mcp",
+  "transport": "streamable-http"
+}
+EOF
+}
+
+integration_usage() {
+  echo "Usage: $(basename "$0") integration <cursor>" >&2
+  exit 1
+}
+
 cmd_cleanup() {
   podman pod rm -f okp
 }
@@ -71,6 +88,12 @@ case "${1:-help}" in
       solr) cmd_verify_solr ;;
       mcp)  cmd_verify_mcp ;;
       *)    verify_usage ;;
+    esac
+    ;;
+  integration)
+    case "${2:-}" in
+      cursor) cmd_integration_cursor ;;
+      *)      integration_usage ;;
     esac
     ;;
   cleanup) cmd_cleanup ;;
