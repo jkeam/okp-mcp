@@ -18,6 +18,7 @@ Commands:
   verify solr        Query Solr to check that RHOKP is running and has indexed content.
   verify mcp         Send an MCP initialize request to verify the MCP server is responding.
   integration cursor Show the MCP server config snippet for Cursor.
+  stop               Stop the okp pod and all its containers.
   cleanup            Stop and remove the okp pod and all its containers.
   help               Show this help message.
 EOF
@@ -42,7 +43,7 @@ cmd_start() {
     -e MCP_SOLR_URL=http://localhost:8983 \
     quay.io/redhat-user-workloads/rhel-lightspeed-tenant/rhel-knowledge-bridge
 
-  echo 'Done! Run "$(basename "$0") cleanup" to stop everything.'
+  echo 'Done! Run "$(basename "$0") stop" to stop everything.'
 }
 
 cmd_verify_solr() {
@@ -77,7 +78,12 @@ integration_usage() {
   exit 1
 }
 
+cmd_stop() {
+  podman pod stop okp
+}
+
 cmd_cleanup() {
+  cmd_stop
   podman pod rm -f okp
 }
 
@@ -96,6 +102,7 @@ case "${1:-help}" in
       *)      integration_usage ;;
     esac
     ;;
+  stop)    cmd_stop ;;
   cleanup) cmd_cleanup ;;
   help|-h|--help) usage ;;
   *)
