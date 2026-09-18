@@ -18,6 +18,7 @@ Commands:
   verify solr        Query Solr to check that RHOKP is running and has indexed content.
   verify mcp         Send an MCP initialize request to verify the MCP server is responding.
   integration cursor Show the MCP server config snippet for Cursor.
+  integration claude Show the MCP server config snippet for Claude Code.
   stop               Stop the okp pod and all its containers.
   cleanup            Stop and remove the okp pod and all its containers.
   help               Show this help message.
@@ -73,8 +74,21 @@ Add the following to your Cursor MCP config:
 EOF
 }
 
+cmd_integration_claude() {
+  cat <<'EOF'
+Add the following to your Claude Code MCP config (.claude/settings.json):
+
+"mcpServers": {
+  "okp-mcp": {
+    "type": "url",
+    "url": "http://localhost:8000/mcp"
+  }
+}
+EOF
+}
+
 integration_usage() {
-  echo "Usage: $(basename "$0") integration <cursor>" >&2
+  echo "Usage: $(basename "$0") integration <cursor|claude>" >&2
   exit 1
 }
 
@@ -99,6 +113,7 @@ case "${1:-help}" in
   integration)
     case "${2:-}" in
       cursor) cmd_integration_cursor ;;
+      claude) cmd_integration_claude ;;
       *)      integration_usage ;;
     esac
     ;;
